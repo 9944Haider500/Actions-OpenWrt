@@ -18,3 +18,21 @@
 
 # Modify hostname
 #sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
+
+#!/bin/sh
+# ... (أوامرك الحالية إن وجدت) ...
+
+# --- إجبار تفعيل Swap ---
+echo "Force enabling KERNEL_SWAP..."
+cd openwrt
+
+# الطريقة 1: استخدام sed لتعديل .config مباشرة
+sed -i 's/# CONFIG_KERNEL_SWAP is not set/CONFIG_KERNEL_SWAP=y/' .config
+
+# الطريقة 2 (بديلة): استخدام أداة scripts/config إن وجدت
+# ./scripts/config --enable KERNEL_SWAP
+
+# بعد التعديل، قم بتحديث الإعدادات القديمة (ضروري)
+make oldconfig
+
+echo "KERNEL_SWAP forced to y"
