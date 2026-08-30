@@ -57,6 +57,19 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
+    # ============================================================
+    # خطوة جديدة: تعديل Config-kernel.in لإجبار تفعيل SWAP
+    # ============================================================
+    - name: Force enable KERNEL_SWAP in kernel config
+      run: |
+        cd openwrt
+        echo "=== FORCING KERNEL_SWAP ==="
+        # تعديل السطر: تغيير "default y if !SMALL_FLASH" إلى "default y"
+        sed -i 's/default y if !SMALL_FLASH/default y/' config/Config-kernel.in
+        # تأكيد التعديل
+        grep -A2 "config KERNEL_SWAP" config/Config-kernel.in
+        echo "=== KERNEL_SWAP FORCED ==="
+
     - name: Load custom feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
@@ -83,6 +96,9 @@ jobs:
       run: |
         cd openwrt
         make defconfig
+        # تأكيد أن التعديل طُبق
+        echo "=== CHECKING KERNEL_SWAP IN .config ==="
+        grep CONFIG_KERNEL_SWAP .config || echo "WARNING: KERNEL_SWAP not found!"
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
