@@ -89,6 +89,31 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
+        # ضغط مجلد packages إذا كان موجوداً
+        if [ -d "packages" ]; then
+          zip -r packages.zip packages/
+        fi
+        # ضغط ملفات .buildinfo
+        for f in *.buildinfo; do
+          if [ -e "$f" ]; then
+            zip "${f%.buildinfo}.buildinfo.zip" "$f"
+          fi
+        done
+        # ضغط ملفات .manifest
+        for f in *.manifest; do
+          if [ -e "$f" ]; then
+            zip "${f%.manifest}.manifest.zip" "$f"
+          fi
+        done
+        # ضغط ملف sha256sums إذا كان موجوداً
+        if [ -e "sha256sums" ]; then
+          zip sha256sums.zip sha256sums
+        fi
+        # ضغط جميع ملفات .json في ملف واحد (إذا وجدت)
+        if ls *.json 1> /dev/null 2>&1; then
+          zip json_files.zip *.json
+        fi
+        # حذف النسخ الأصلية
         rm -rf packages *.buildinfo *.manifest sha256sums *.json
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
@@ -201,6 +226,31 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
+        # ضغط مجلد packages إذا كان موجوداً
+        if [ -d "packages" ]; then
+          zip -r packages.zip packages/
+        fi
+        # ضغط ملفات .buildinfo
+        for f in *.buildinfo; do
+          if [ -e "$f" ]; then
+            zip "${f%.buildinfo}.buildinfo.zip" "$f"
+          fi
+        done
+        # ضغط ملفات .manifest
+        for f in *.manifest; do
+          if [ -e "$f" ]; then
+            zip "${f%.manifest}.manifest.zip" "$f"
+          fi
+        done
+        # ضغط ملف sha256sums إذا كان موجوداً
+        if [ -e "sha256sums" ]; then
+          zip sha256sums.zip sha256sums
+        fi
+        # ضغط جميع ملفات .json في ملف واحد (إذا وجدت)
+        if ls *.json 1> /dev/null 2>&1; then
+          zip json_files.zip *.json
+        fi
+        # حذف النسخ الأصلية
         rm -rf packages *.buildinfo *.manifest sha256sums *.json
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
